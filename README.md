@@ -1,13 +1,21 @@
 # Proyecto-EL4106
-Proyecto-EL4106
+Proyecto-EL4106 Este consiste en la implementacion de algoritmos geneticos para el calculo de la cinematica inversa de un brazo robotico de 4dof.
 
 # Links
 [Repo brazo 4dof](https://github.com/JavierUR/SimpleArm)
 
+
 # Meeting 1
 
-hol
-##
+## Algoritmo Evolutivo
+### Definiciones
+#### Codificación
+Pendiente
+#### Operador Genetico de selección
+
+#### Croosover
+#### Mutación
+#### Fitness
 
 ## Cinematica Directa
 Para la cinematica directa se utilzo la formulacion 'Denavit-hartenberg' En la cual tenemos los valores parametrizados de:
