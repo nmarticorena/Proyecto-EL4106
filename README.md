@@ -7,14 +7,39 @@ Proyecto-EL4106 Este consiste en la implementacion de algoritmos geneticos para 
 
 # Meeting 1
 
+## Brazo
+<img src="doc/Diagrama_brazo.png" width="800" height="540" />
+
 ## Algoritmo Evolutivo
 ### Definiciones
 #### Codificación
-Pendiente
+Nuestra codificación para cada individuo sigue las normas de evolucion diferencial, en la cual no se consideran un genoma binario si no un genoma de valor Real, basados en el paper xxx es tomar los indivuos como:
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=X=(\theta_1,\theta_2,\theta_3,\theta_4)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?X=(\theta_1,\theta_2,\theta_3,\theta_4)" title="X=(\theta_1,\theta_2,\theta_3,\theta_4)" /></a>
+Con cada uno de los angulos los angulos de rotación de cada uno de los motores del brazo. 
+
+Esta solución es la más encontrada en la literatura sobre estos tipos.
+
+Nosotros tambien proponemos la siguente codificacion:
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=X=(\widehat{\theta_1}|\widehat{\theta_2}|\widehat{\theta_3}|\widehat{\theta_4})" target="_blank"><img src="https://latex.codecogs.com/gif.latex?X=(\widehat{\theta_1}|\widehat{\theta_2}|\widehat{\theta_3}|\widehat{\theta_4})" title="X=(\widehat{\theta_1}|\widehat{\theta_2}|\widehat{\theta_3}|\widehat{\theta_4})" /></a>
+
+Donde theta gorro es 
+<a href="https://www.codecogs.com/eqnedit.php?latex=\widehat{\theta_i}=\begin{bmatrix}&space;\theta_{i_1}\\&space;\theta_{i_2}\\&space;...\\&space;\theta_{i_j}\\&space;\theta_{i_N}\\&space;\end{bmatrix}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\widehat{\theta_i}=\begin{bmatrix}&space;\theta_{i_1}\\&space;\theta_{i_2}\\&space;...\\&space;\theta_{i_j}\\&space;\theta_{i_N}\\&space;\end{bmatrix}" title="\widehat{\theta_i}=\begin{bmatrix} \theta_{i_1}\\ \theta_{i_2}\\ ...\\ \theta_{i_j}\\ \theta_{i_N}\\ \end{bmatrix}" /></a>
+El cual es el vector de los N de la trayectoria discretizada.
+
 #### Operador Genetico de selección
 
+Para el operador genetico de selección se propone el one to one tournament el cual consite en evaluar el fitnes de los padres y los hijos individuo a individuo en el cual sobrevie el que obtenga un fitness mayor.
+
 #### Croosover
+
+
 #### Mutación
+Se incluye la lista de posibles mutaciones
+<img src="doc/Diagrama_brazo.png" width="800" height="540" />
+
+
 #### Fitness
 
 ## Cinematica Directa
