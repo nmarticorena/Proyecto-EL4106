@@ -37,7 +37,7 @@ Para el operador genetico de selección se propone el one to one tournament el c
 
 #### Mutación
 Se incluye la lista de posibles mutaciones
-<img src="doc/Diagrama_brazo.png" width="800" height="540" />
+<img src="doc/mutations.png" width="800" height="540" />
 
 
 #### Fitness
