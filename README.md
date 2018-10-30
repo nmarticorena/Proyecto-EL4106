@@ -33,6 +33,12 @@ El cual es el vector de los N de la trayectoria discretizada.
 Para el operador genetico de selección se propone el one to one tournament el cual consite en evaluar el fitnes de los padres y los hijos individuo a individuo en el cual sobrevie el que obtenga un fitness mayor.
 
 #### Croosover
+Para el caso de los algoritmos de la funcion de crossover es complementaria a la mutación y esta dada por la siguiente formula:
+<a href="https://www.codecogs.com/eqnedit.php?latex=\inline&space;u_{i}=\{u_j\}=\left\{\begin{matrix}&space;v_j&space;&&space;\text{,&space;if&space;Rand}_j\text{(0,1)}\leq&space;C_R&space;\\&space;x_j&space;&&space;\text{,&space;otherwise}&space;\end{matrix}\right." target="_blank"><img src="https://latex.codecogs.com/gif.latex?\inline&space;u_{i}=\{u_j\}=\left\{\begin{matrix}&space;v_j&space;&&space;\text{,&space;if&space;Rand}_j\text{(0,1)}\leq&space;C_R&space;\\&space;x_j&space;&&space;\text{,&space;otherwise}&space;\end{matrix}\right." title="u_{i}=\{u_j\}=\left\{\begin{matrix} v_j & \text{, if Rand}_j\text{(0,1)}\leq C_R \\ x_j & \text{, otherwise} \end{matrix}\right." /></a>
+
+Donde C_R es el croosover rate value el cual oscila entre 0 y 1.
+
+Se tomo un criterio binario de croosover
 
 
 #### Mutación
@@ -40,7 +46,15 @@ Se incluye la lista de posibles mutaciones
 <img src="doc/Mutations.png" width="600" height="350" />
 
 
+Donde F es el factor de escala y X_{r1} es el individuo de indice r_i con r_i un entero aleatorio.
+
 #### Fitness
+Nuestra funcion de fitnes dependeria del caso de nuestra codificación.
+##### Caso 1
+<a href="https://www.codecogs.com/eqnedit.php?latex=\inline&space;F(x_i)=A*Error_{cartesiano}(X_{Final},x_i)&plus;B*\text{Energia&space;cinetica&space;rotacional}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\inline&space;F(x_i)=A*Error_{cartesiano}(X_{Final},x_i)&plus;B*\text{Energia&space;cinetica&space;rotacional}" title="F(x_i)=A*Error_{cartesiano}(X_{Final},x_i)+B*\text{Energia cinetica rotacional}" /></a>
+##### Caso 2
+<a href="https://www.codecogs.com/eqnedit.php?latex=\inline&space;F(x_i)=A*||X_{Final},x_{iN}||&plus;B*\sum_{j=2}^{N}\text{Energia&space;cinetica&space;rotacional}(x_{ij},x_{ij-1})&plus;C*\sum_{j=2}^{N}\frac{1}{x_{ij}-x_{ij-1}}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\inline&space;F(x_i)=A*||X_{Final},x_{iN}||&plus;B*\sum_{j=2}^{N}\text{Energia&space;cinetica&space;rotacional}(x_{ij},x_{ij-1})&plus;C*\sum_{j=2}^{N}\frac{1}{x_{ij}-x_{ij-1}}" title="F(x_i)=A*||X_{Final},x_{iN}||+B*\sum_{j=2}^{N}\text{Energia cinetica rotacional}(x_{ij},x_{ij-1})+C*\sum_{j=2}^{N}\frac{1}{x_{ij}-x_{ij-1}}" /></a>
+
 
 ## Cinematica Directa
 Para la cinematica directa se utilzo la formulacion 'Denavit-hartenberg' En la cual tenemos los valores parametrizados de:
