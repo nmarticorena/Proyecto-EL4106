@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import ctypes
 import os
 import sys
@@ -30,4 +32,3 @@ def fitDistance(individual,objective):
         objP = arr_t2(*objective)
     return _distance(indP,objP)
 
-#!/usr/bin/env python
