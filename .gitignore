@@ -2,3 +2,4 @@
 .idea/
 *.so
 */.ipynb_checkpoints/
+*.db
