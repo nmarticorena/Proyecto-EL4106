@@ -4,8 +4,8 @@ import ctypes
 import os
 import sys
 import numpy as np
-
-path = os.path.dirname(__file__)
+import math
+path = os.path.dirname(os.path.abspath(__file__))
 distancedll = ctypes.CDLL(os.path.join(path, "distance.dll" if sys.platform.startswith("win") else "distance.so"))
 
 
@@ -32,3 +32,11 @@ def fitDistance(individual,objective):
         objP = arr_t2(*objective)
     return _distance(indP,objP)
 
+#Test
+if __name__ == '__main__':
+    import math
+    ind=np.array([1,0.5,1.1 ,-1],dtype='double')
+    objective=[0.7,0.7,1]
+    res=fitDistance(ind,objective)
+    print(res)
+    print(math.isclose(res,0.47195012030477))
