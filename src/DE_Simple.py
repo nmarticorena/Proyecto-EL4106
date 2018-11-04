@@ -4,11 +4,22 @@ import sys
 import numpy as np
 import fitness
 from ctypes import POINTER,c_double
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# configuracion graficos
+sns.set()  # estilo por defecto de seaborn
+sns.set_context('notebook', font_scale=1.5) # contexto notebook 
+plt.rcParams['figure.figsize'] = (6,6)
 
 dataP=POINTER(c_double)
 
+
+
 #Diferential Evolution
-def de(fobj,obj, bounds, mut=0.8, crossp=0.7, popsize=20, its=1000):
+def de(fobj,obj, bounds, mut=0.8, crossp=0.7, popsize=20, its=100):
+    global errores_mejor
+    errores_mejor=np.zeros(its)
     pop = np.random.rand(20, 4)
     min_b, max_b = np.asarray(bound).T
     diff = np.fabs(min_b - max_b)
@@ -42,6 +53,8 @@ def de(fobj,obj, bounds, mut=0.8, crossp=0.7, popsize=20, its=1000):
         best_idx = np.argmin(Pfitness)
         pop_denorm = min_b + pop * diff
         best = pop_denorm[best_idx]
+        #print(best)
+        errores_mejor[i]=Pfitness[best_idx]
         yield best, Pfitness[best_idx]
 
 def derangementN(n):
@@ -68,6 +81,13 @@ if __name__ == '__main__':
         print(ob)
         l=list(de(fitC,ob,bound))
         print(l[-1])
+        #print(errores_mejor)
+        plt.plot(errores_mejor)
+        plt.xlabel("iteraciones")
+        plt.title("Error cartesiano de posicion de mejor individuo")
+        plt.ylabel("Error cartesiano")
+        plt.show()
+
     except:
         point =''
         print("Debe entregar objetivo de la forma: x,y,z")
