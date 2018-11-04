@@ -9,13 +9,12 @@ dataP=POINTER(c_double)
 
 #Diferential Evolution
 def de(fobj,obj, bounds, mut=0.8, crossp=0.7, popsize=20, its=1000):
-    objP=obj.ctypes.data_as(POINTER(c_double))
     pop = np.random.rand(20, 4)
     min_b, max_b = np.asarray(bound).T
     diff = np.fabs(min_b - max_b)
     pop_denorm = min_b + pop * diff
     Pfitness = np.asarray([fobj(ind,obj) for ind in pop_denorm])
-    best_idx = np.argmin(fitness)
+    best_idx = np.argmin(Pfitness)
     best = pop_denorm[best_idx]
     for i in range(its):
         #Elegir padres
@@ -40,7 +39,8 @@ def de(fobj,obj, bounds, mut=0.8, crossp=0.7, popsize=20, its=1000):
         Pfitness=np.where(test,fitnessT,Pfitness)
         indn=test.nonzero()
         pop[indn]=trial[indn]
-        best_idx = np.argmin(fitness)
+        best_idx = np.argmin(Pfitness)
+        pop_denorm = min_b + pop * diff
         best = pop_denorm[best_idx]
         yield best, Pfitness[best_idx]
 
@@ -58,7 +58,8 @@ def fitC(ind,ob):
     return fitness._distance(ind.ctypes.data_as(dataP),ob.ctypes.data_as(dataP))
 
 ob=np.array([0.7,0.7,1])
-bound=[(-5, 5), (0, 1.5), (-1.1, 1.1), (-1.2, 1.2)]
+pi=np.pi
+bound=[(-5, 5), (-pi/2, pi/2), (-pi/2, pi/2), (-pi/2, pi/2)]
 
 if __name__ == '__main__':
     try:
