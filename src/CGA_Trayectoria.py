@@ -29,7 +29,7 @@ dataP=POINTER(c_double)
 
 
 #Diferential Evolution
-def cga(fobj,obj, bounds,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=1000, its=1000,pcj=0.5,pmj=1):
+def cga(fobj,obj, bounds,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=1000, its=4000,pcj=0.5,pmj=1):
     global errores_mejor
     errores_mejor=np.zeros(its)
     pop=initGauss(bounds,nk,popsize,angle_in)
@@ -55,16 +55,16 @@ def cga(fobj,obj, bounds,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=1000, its=
             for j in range(popsize):
                 fitnessT[j]=fobj(pop[j],obj,angle_in,nk)
             max_fitness=np.sum(fitnessT)
-            elite_index=np.argpartition(fitnessT, -10)[-10:]
+            elite_index=np.argpartition(fitnessT, -1*elite_total)[-1*elite_total:]
             fitnessRel=fitnessT/max_fitness
             aceptados=0
             aceptados_array=np.random.choice(popsize, popsize, p=fitnessRel)
-
-			childs[0:elite_total]=pop[elite_index]
+            
+            childs[0:elite_total]=pop[elite_index]
             
 
 
-            for j in range((popsize/2)):
+            for j in range((popsize/2)-elite_total):
                 indexP1=aceptados_array[j*2]
                 indexP2=aceptados_array[j*2+1]
                 while indexP1==indexP2:
@@ -92,7 +92,7 @@ def cga(fobj,obj, bounds,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=1000, its=
                 print("alcance un fitness de:{} con promedio {}".format(Pfitness[best_idx],np.mean(Pfitness)))
                 hall_of_fame=best.copy()
 
-            if Pfitness[best_idx]>=1.0-0.001:
+            if Pfitness[best_idx]>=2.0-0.001:
                 print("alcance un fitness de:{}".format(Pfitness[best_idx]))
                 termino=True
             #print(i)
@@ -133,7 +133,7 @@ def derangementN(n):
 dataP=POINTER(c_double)
 def fitC(ind,ob,angle_in,nk):
     res=0;
-    res+=fitness._distance(ind[-1,:].ctypes.data_as(dataP),ob.ctypes.data_as(dataP))*(200)
+    res+=fitness._distance(ind[-1,:].ctypes.data_as(dataP),ob.ctypes.data_as(dataP))*(1000)
     res2=0
     for i in range(nk-1):
         res2+=(np.sum(np.abs(ind[i,:]-ind[i+1,:])))*5 #quizas ponerlo en 5
@@ -236,7 +236,7 @@ if __name__ == '__main__':
     angle_in=np.array([float(i) for i in angle])
     print(ob)
     print(angle_in)
-    nk=300
+    nk=50
     l=list(cga(fitC,ob,bounds,angle_in,nk=nk))
     print(l[-1])
     print(np.sqrt(fitness._distance(l[-1][0][-1,:].ctypes.data_as(dataP),ob.ctypes.data_as(dataP))))
