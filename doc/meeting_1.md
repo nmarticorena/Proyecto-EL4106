@@ -36,7 +36,7 @@ Se tomo un criterio binario de croosover
 
 #### Mutación
 Se incluye la lista de posibles mutaciones
-<img src="doc/Mutations.png" width="600" height="350" />
+<img src="Mutations.png" width="600" height="350" />
 
 
 Donde F es el factor de escala y X_{r1} es el individuo de indice r_i con r_i un entero aleatorio.
