@@ -1,7 +1,7 @@
 # Meeting 1
 
 ## Brazo
-<img src="doc/Diagrama_brazo.png" width="800" height="540" />
+<img src="Diagrama_brazo.png" width="800" height="540" />
 
 ## Algoritmo Evolutivo
 ### Definiciones
