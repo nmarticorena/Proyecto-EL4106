@@ -20,7 +20,7 @@ dataP=POINTER(c_double)
 def de(fobj,obj, bounds, mut=0.8, crossp=0.7, popsize=20, its=100):
     global errores_mejor
     errores_mejor=np.zeros(its)
-    pop = np.random.rand(20, 4)
+    pop = np.random.rand(popsize, 4)
     min_b, max_b = np.asarray(bound).T
     diff = np.fabs(min_b - max_b)
     pop_denorm = min_b + pop * diff
@@ -29,12 +29,12 @@ def de(fobj,obj, bounds, mut=0.8, crossp=0.7, popsize=20, its=100):
     best = pop_denorm[best_idx]
     for i in range(its):
         #Elegir padres
-        ina=derangementN(20)
-        inb=derangementN(20)
-        inc=derangementN(20)
+        ina=derangementN(popsize)
+        inb=derangementN(popsize)
+        inc=derangementN(popsize)
         #crear mutantes
-        mut=np.clip((pop[ina]+0.8*(pop[inb]-pop[inc])),0,1)
-        cross_points = np.random.rand(20,4) < 0.7
+        mut=np.clip((pop[ina]+mut*(pop[inb]-pop[inc])),0,1)
+        cross_points = np.random.rand(popsize,4) < crossp
         #Ver cross
         f=np.nonzero(cross_points.sum(1)==0)
         cross_points[f,np.random.randint(4,size=len(f))]=1
