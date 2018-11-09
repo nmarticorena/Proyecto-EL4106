@@ -38,7 +38,7 @@ class Generator(object):
         self.E_2=0
         self.E_3=0
         self.i=0
-        self.j=0
+        self.j=-80
         self.k=-90
         self.l=-92
         self.publisher()
@@ -73,24 +73,30 @@ class Generator(object):
         self.pub4.publish(self.command4)
         rospy.sleep(10)
         rospy.loginfo("Inicio benchmark")
-        delta_angulo=2.25
-        delta_tiempo=5
+        delta_angulo=2
+        delta_tiempo=2
         l_mul=1.0
         k_mul=1.0
-        while self.j < 90:
+        while self.j < 0:
             self.l+=delta_angulo*l_mul
             if self.l>90:
+                if self.k>90:
+                    self.j+=delta_angulo
+                    k_mul=-1
+                if self.k<-90:
+                    self.j+=delta_angulo
+                    k_mul=1
                 self.k+=delta_angulo*k_mul
                 l_mul=-1
             if self.l<-90:
+                if self.k>90:
+                    self.j+=delta_angulo
+                    k_mul=-1
+                if self.k<-90:
+                    self.j+=delta_angulo
+                    k_mul=1
                 self.k+=delta_angulo*k_mul
                 l_mul=1
-            if self.k>90:
-                self.j+=delta_angulo
-                k_mul=-1
-            if self.k<-90:
-                self.j+=delta_angulo
-                k_mul=1
             self.command1.data=self.i*(2.0*math.pi)/360.0
             self.command2.data=self.j*(2.0*math.pi)/360.0
             self.command3.data=self.k*(2.0*math.pi)/360.0
