@@ -39,7 +39,7 @@ def cga(fobj,obj, bounds,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=1000, its=
     best = pop[best_idx]
     hall_of_fame=best
     termino=False
-    elite_ind=popsize/10
+    elite_total=int(popsize/10)
     try:
         a=tqdm(range(its))
     except:
@@ -55,10 +55,16 @@ def cga(fobj,obj, bounds,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=1000, its=
             for j in range(popsize):
                 fitnessT[j]=fobj(pop[j],obj,angle_in,nk)
             max_fitness=np.sum(fitnessT)
+            elite_index=np.argpartition(fitnessT, -10)[-10:]
             fitnessRel=fitnessT/max_fitness
             aceptados=0
             aceptados_array=np.random.choice(popsize, popsize, p=fitnessRel)
-            for j in range(popsize/2):
+
+			childs[0:elite_total]=pop[elite_index]
+            
+
+
+            for j in range((popsize/2)):
                 indexP1=aceptados_array[j*2]
                 indexP2=aceptados_array[j*2+1]
                 while indexP1==indexP2:
@@ -74,8 +80,8 @@ def cga(fobj,obj, bounds,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=1000, its=
                     C1=mutation(C1,bounds,pmj)
                 if np.random.rand()<mut:
                     C2=mutation(C2,bounds,pmj)
-                childs[j*2]=C1.copy()
-                childs[j*2+1]=C2.copy()
+                childs[j*2+elite_total]=C1.copy()
+                childs[j*2+1+elite_total]=C2.copy()
 
             pop=childs.copy()
             Pfitness = np.asarray([fobj(ind,obj,angle_in,nk) for ind in pop])
