@@ -73,4 +73,4 @@ altura=0.1 mt
 ### Traslación final
 <a href="https://www.codecogs.com/eqnedit.php?latex=^{i-1}T_i=T_{traslacion}(Joint_i)&plus;Rot(\theta_i)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?^{i-1}T_i=T_{traslacion}(Joint_i)&plus;Rot(\theta_i)" title="^{i-1}T_i=T_{traslacion}(Joint_i)+Rot(\theta_i)" /></a>
 
-<a href="https://www.codecogs.com/eqnedit.php?latex=T_{base}=\prod_{i=1}^{n}^{i-1}T_i" target="_blank"><img 
+<a href="https://www.codecogs.com/eqnedit.php?latex=T_{base}=\prod_{i=1}^{n}^{i-1}T_i" target="_blank"><img>
