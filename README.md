@@ -1,6 +1,10 @@
 # Proyecto-EL4106
 Proyecto-EL4106 Este consiste en la implementacion de algoritmos geneticos para el calculo de la cinematica inversa de un brazo robotico de 4dof.
 
+# Integrantes
+Javier Urrutia R.
+Nicolás Marticorena V.
+
 # Links
 [Repo brazo 4dof](https://github.com/JavierUR/SimpleArm)
 
