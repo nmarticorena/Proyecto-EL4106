@@ -3,3 +3,4 @@
 *.so
 */.ipynb_checkpoints/
 *.db
+*.csv
