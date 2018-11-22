@@ -6,6 +6,7 @@ import fitness
 from ctypes import POINTER,c_double
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pandas as pd
 try:
     from tqdm import tqdm
 except:
@@ -87,6 +88,9 @@ def cga(fobj,obj, bounds,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=1000, its=
             Pfitness = np.asarray([fobj(ind,obj,angle_in,nk) for ind in pop])
             best_idx=np.argmax(Pfitness)
             best=pop[best_idx]
+            if i%10==0:
+                df = pd.DataFrame(best)
+                df.to_csv("trayectorias/file_path{}.csv".format(i))
             if fobj(hall_of_fame,obj,angle_in,nk)<Pfitness[best_idx]:
                 print("Encontre uno mejor con fitness igual a {}".format(Pfitness[best_idx]))
                 print("alcance un fitness de:{} con promedio {}".format(Pfitness[best_idx],np.mean(Pfitness)))
