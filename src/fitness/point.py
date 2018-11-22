@@ -3,6 +3,7 @@ import numpy as np
 import rospy
 from visualization_msgs.msg import Marker
 from geometry_msgs.msg import Point
+import sys
 
 def show_point(punto):
     rospy.init_node('rviz_publisher')
@@ -39,5 +40,5 @@ def show_point(punto):
         rate.sleep()
 
 if __name__ == '__main__':
-	punto = np.array([0.5,0.5,0.5])
+	punto = [1,1,1]
 	show_point(punto)
