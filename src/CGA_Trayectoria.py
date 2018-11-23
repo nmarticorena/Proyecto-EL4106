@@ -29,7 +29,7 @@ nk=20
 dataP=POINTER(c_double)
 
 #Diferential Evolution
-def cga(fobj,obj, bounds,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=1000, its=4000,pcj=0.5,pmj=1):
+def cga(fobj,obj, bounds,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=1000, its=800,pcj=0.5,pmj=1):
     global errores_mejor
     errores_mejor=np.zeros(its)
     pop=initGauss(bounds,nk,popsize,angle_in)
@@ -135,16 +135,16 @@ dataP=POINTER(c_double)
 def fitC(ind,ob,angle_in,nk):
     global Masa
     res=0;
-    
+    0.25
     res+=fitness._distance(ind[-1,:].ctypes.data_as(dataP),ob.ctypes.data_as(dataP))*(1000)
     res2=0
     for i in range(nk-1):
-        res2+=((np.abs(ind[i,0]-ind[i+1,0])))*4 #quizas ponerlo en 5
+        res2+=((np.abs(ind[i,0]-ind[i+1,0])))*(1.0/2.0) #quizas ponerlo en 5
        
-        res2+=((np.abs(ind[i,1]-ind[i+1,1])))*3
-        res2+=((np.abs(ind[i,2]-ind[i+1,2])))*2
-        res2+=((np.abs(ind[i,3]-ind[i+1,3])))
-
+        res2+=((np.abs(ind[i,1]-ind[i+1,1])))*(1)
+        res2+=((np.abs(ind[i,2]-ind[i+1,2])))*(3/2)
+        res2+=((np.abs(ind[i,3]-ind[i+1,3])))*(2)
+    #print(res,res2)
     res2=res2
     #res+=np.sum(np.abs(angle_in-ind[0,:]))
     #print("funcion de diferencia final {}".format(res))
