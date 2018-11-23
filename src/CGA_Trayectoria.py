@@ -90,6 +90,9 @@ def cga(fobj,obj, bounds,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=1000, its=
             if i%10==0:
                 df = pd.DataFrame(best)
                 df.to_csv("trayectorias/file_path{}.csv".format(i))
+            if i==its-1:
+                df = pd.DataFrame(best)
+                df.to_csv("trayectorias/file_path{}.csv".format(its))
             if fobj(hall_of_fame,obj,angle_in,nk)<Pfitness[best_idx]:
                 print("Encontre uno mejor con fitness igual a {}".format(Pfitness[best_idx]))
                 print("alcance un fitness de:{} con promedio {}".format(Pfitness[best_idx],np.mean(Pfitness)))
