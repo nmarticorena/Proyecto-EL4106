@@ -19,7 +19,7 @@ sns.set_context('poster', font_scale=0.8) # contexto notebook
 plt.rcParams['figure.figsize'] = (7,7)
 plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=None, hspace=0.4)
 #plt.style.use('seaborn-white')
-
+Masa=5
 
 #PARAMS
 pi=np.pi
@@ -27,7 +27,6 @@ bounds=[(-5, 5), (-pi/2, pi/2), (-pi/2, pi/2), (-pi/2, pi/2)]
 nk=20
 
 dataP=POINTER(c_double)
-
 
 #Diferential Evolution
 def cga(fobj,obj, bounds,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=1000, its=4000,pcj=0.5,pmj=1):
@@ -121,9 +120,6 @@ def cga(fobj,obj, bounds,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=1000, its=
         #while aceptados<popsize:
          #   a=2
 
-
-
-
 def derangementN(n):
     v=np.arange(n)
     num=np.arange(n)
@@ -135,12 +131,19 @@ def derangementN(n):
     
 #Funcion de fitness
 dataP=POINTER(c_double)
+
 def fitC(ind,ob,angle_in,nk):
+    global Masa
     res=0;
+    
     res+=fitness._distance(ind[-1,:].ctypes.data_as(dataP),ob.ctypes.data_as(dataP))*(1000)
     res2=0
     for i in range(nk-1):
-        res2+=(np.sum(np.abs(ind[i,:]-ind[i+1,:])))*5 #quizas ponerlo en 5
+        res2+=((np.abs(ind[i,0]-ind[i+1,0])))*4 #quizas ponerlo en 5
+       
+        res2+=((np.abs(ind[i,1]-ind[i+1,1])))*3
+        res2+=((np.abs(ind[i,2]-ind[i+1,2])))*2
+        res2+=((np.abs(ind[i,3]-ind[i+1,3])))
 
     res2=res2
     #res+=np.sum(np.abs(angle_in-ind[0,:]))
@@ -149,7 +152,6 @@ def fitC(ind,ob,angle_in,nk):
     return (1/(1+res))*(1/(1+res2))
     n=np.random.rand()
     r#eturn (1/(1+res))*n + (1-n)*(1/(1+res2))
-
 
 def initGauss(bounds,nk,popsize,angle_in):
     min_b, max_b = np.asarray(bounds).T
@@ -170,7 +172,6 @@ def initGauss(bounds,nk,popsize,angle_in):
     pop+=A*np.exp(-((rank.reshape(1,nk,1)-u.reshape(popsize,1,4))/(2*sigma))**2)
     pop=pop.clip(min_b,max_b)
     return pop
-
 
 def initanh(bounds,nk,popsize,angle_in):
     min_b, max_b = np.asarray(bounds).T
@@ -241,6 +242,7 @@ if __name__ == '__main__':
     print(ob)
     print(angle_in)
     nk=50
+    ob=np.array([0,0,0,0])
     l=list(cga(fitC,ob,bounds,angle_in,nk=nk))
     print(l[-1])
     print(np.sqrt(fitness._distance(l[-1][0][-1,:].ctypes.data_as(dataP),ob.ctypes.data_as(dataP))))
