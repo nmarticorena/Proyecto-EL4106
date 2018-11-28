@@ -29,7 +29,7 @@ nk=20
 dataP=POINTER(c_double)
 
 #Diferential Evolution
-def cga(fobj,obj, bounds,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=1000, its=800,pcj=0.5,pmj=1):
+def cga(fobj,obj, bounds,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=1000, its=1000,pcj=0.5,pmj=1):
     global errores_mejor
     errores_mejor=np.zeros(its)
     pop=initGauss(bounds,nk,popsize,angle_in)
@@ -138,15 +138,13 @@ dataP=POINTER(c_double)
 def fitC(ind,ob,angle_in,nk):
     global Masa
     res=0;
-    0.25
     res+=fitness._distance(ind[-1,:].ctypes.data_as(dataP),ob.ctypes.data_as(dataP))*(1000)
     res2=0
-    for i in range(nk-1):
-        res2+=((np.abs(ind[i,0]-ind[i+1,0])))*(1.0/2.0) #quizas ponerlo en 5
-       
-        res2+=((np.abs(ind[i,1]-ind[i+1,1])))*(1)
-        res2+=((np.abs(ind[i,2]-ind[i+1,2])))*(3/2)
-        res2+=((np.abs(ind[i,3]-ind[i+1,3])))*(2)
+    for i in range(nk-2):
+        res2+=np.abs((np.abs(ind[i,0]-ind[i+1,0]))-((np.abs(ind[i+1,0]-ind[i+2,0]))))*(2.0) #quizas ponerlo en 5
+        res2+=np.abs((np.abs(ind[i,1]-ind[i+1,1]))-((np.abs(ind[i+1,1]-ind[i+2,1]))))*(3.0/2.0)
+        res2+=np.abs((np.abs(ind[i,2]-ind[i+1,2]))-((np.abs(ind[i+1,2]-ind[i+2,2]))))*(1)
+        res2+=np.abs((np.abs(ind[i,3]-ind[i+1,3]))-((np.abs(ind[i+1,3]-ind[i+2,3]))))*(1.0/2.0)
     #print(res,res2)
     res2=res2
     #res+=np.sum(np.abs(angle_in-ind[0,:]))
@@ -244,8 +242,8 @@ if __name__ == '__main__':
     angle_in=np.array([float(i) for i in angle])
     print(ob)
     print(angle_in)
-    nk=50
-    ob=np.array([0,0,0,0])
+    nk=100
+    angle_in=np.array([0.0,0.0,0.0,0.0])
     l=list(cga(fitC,ob,bounds,angle_in,nk=nk))
     print(l[-1])
     print(np.sqrt(fitness._distance(l[-1][0][-1,:].ctypes.data_as(dataP),ob.ctypes.data_as(dataP))))
