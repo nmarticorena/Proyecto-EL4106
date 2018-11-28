@@ -149,7 +149,7 @@ def fitC(ind,ob,angle_in,nk):
     0.25
     res+=fitDistance(ind[-1,:],ob)*(1000)
     res2=0
-    for i in range(nk-1):
+    for i in range(nk-2):
         res2+=np.abs((np.abs(ind[i,0]-ind[i+1,0]))-((np.abs(ind[i+1,0]-ind[i+2,0]))))*(2.0) #quizas ponerlo en 5
         res2+=np.abs((np.abs(ind[i,1]-ind[i+1,1]))-((np.abs(ind[i+1,1]-ind[i+2,1]))))*(3.0/2.0)
         res2+=np.abs((np.abs(ind[i,2]-ind[i+1,2]))-((np.abs(ind[i+1,2]-ind[i+2,2]))))*(1)
@@ -161,9 +161,9 @@ def fitC(ind,ob,angle_in,nk):
     #print("Suma de errores {}".format(res2))
     return (1/(1+res))*(1/(1+res2))
 
-@guvectorize(['void(float64[:,:,:], float64[:],float64[:],int64, float64[:])'], '(n,k,m),(p),(m),()->(n)',target='parallel')
+@guvectorize(['void(float64[:,:,:], float64[:],float64[:],int64, float64[:])'], '(n,k,m),(p),(m),()->(n)',target='cpu')
 def fitPar(pop,ob,angle_in,nk,fit):
-    for j in prange(pop.shape[0]):
+    for j in range(pop.shape[0]):
             fit[j]=fitC(pop[j],ob,angle_in,nk)
 
 @jit(['float64[:,:,:](float64[:],float64[:], int64, int64, float64[:])'],nopython=True)
@@ -256,7 +256,7 @@ def makeChilds(pop,popsize,Pfitness,aceptados_array,childs,min_b,max_b,elite_tot
     elite_index=np.argsort(Pfitness)[-1*elite_total:]
     childs[0:elite_total]=pop[elite_index]
 
-    for j in prange(int((popsize/2)-elite_total)):
+    for j in range(int((popsize/2)-elite_total)):
         indexP1=aceptados_array[j*2]
         indexP2=aceptados_array[j*2+1]
         while indexP1==indexP2:
