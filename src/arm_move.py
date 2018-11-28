@@ -50,6 +50,7 @@ class Generator(object):
         i2=its/2
         i3=its-1
         print("Voy a empezar a graficar")
+        rospy.sleep(2)
         self.Reset_Arm()
         self.Show(lista,nk,i0)
     def Reset_Arm(self):
@@ -88,7 +89,7 @@ if __name__ == '__main__':
     nk=20
     its=500
     angle_in=[0,0,0,0]
-    df=pd.read_csv("./trayectorias/file_path3990.csv")
+    df=pd.read_csv("./trayectorias/file_path800.csv")
     a=df.values
     a=a[:,1:]
     Generator(lista=a,nk=nk,its=its)
