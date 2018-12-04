@@ -27,7 +27,7 @@ nk=20
 
 
 #Diferential Evolution
-def cga(fobj,obj, min_b,max_b,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=1000, its=30000,pcj=0.5,pmj=1.0):
+def cga(fobj,obj, min_b,max_b,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=4000, its=15000,pcj=0.5,pmj=1.0):
     global errores_mejor
     errores_mejor=np.zeros(its)
     pop=initGauss(min_b,max_b,nk,popsize,angle_in)
@@ -35,8 +35,8 @@ def cga(fobj,obj, min_b,max_b,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=1000,
     Pfitness=np.zeros(popsize)
     fobj(pop,obj,angle_in,nk,Pfitness)
     best_idx = np.argmax(Pfitness)
-    best = pop[best_idx]
-    hall_of_fame=best
+    best = pop[best_idx].copy()
+    hall_of_fame=best.copy()
     hall_of_fame_f=Pfitness[best_idx];
     termino=False
     elite_total=int(popsize/10)
@@ -61,7 +61,7 @@ def cga(fobj,obj, min_b,max_b,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=1000,
             pop=childs.copy()
             fobj(pop,obj,angle_in,nk,Pfitness)
             best_idx=np.argmax(Pfitness)
-            best=pop[best_idx]
+            best=pop[best_idx].copy()
             if i%10==0:
                 df = pd.DataFrame(best)
                 df.to_csv("trayectorias/file_path{}.csv".format(i))
@@ -229,7 +229,7 @@ def cross(P1,P2,pcj):
     W=0.5*(1+np.tanh((rank.reshape(nk,1)-u)/sigma))
     mW=1-W
     C1=P1.copy()
-    C2=P1.copy()
+    C2=P2.copy()
     C1[1:,crossJ]=(W*P1+mW*P2)[1:,crossJ]
     C2[1:,crossJ]=(mW*P1+W*P2)[1:,crossJ]
     return C1,C2
