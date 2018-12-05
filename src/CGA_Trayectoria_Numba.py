@@ -174,13 +174,18 @@ def fitC(ind,ob,angle_in,nk):
     #res+=np.sum(np.abs(angle_in-ind[0,:]))
     #print("funcion de diferencia final {}".format(res))
     #print("Suma de errores {}".format(res2))
-    return (1/(1+res))*(1/(1+4*res2))*(1/(1+4*res3))
+    A=(1/(1+res))
+    B=(1/(1+1*res2))
+    C=(1/(1+1*res3))
+    a=np.random.rand(1)
+    b=np.random.rand(1)*(1-a)
+    c=1-a-b
+    return (a*A+b*B+c*C)*(A*B*C)
 
 @jit(nopython=True)
 def fit_grafico(ind,ob,angle_in,nk):
     global Masa
     res=0;
-    0.25
     res+=fitDistance(ind[-1,:],ob)*(1000)
     res2=0
     res3=0
@@ -327,7 +332,7 @@ if __name__ == '__main__':
     print(angle_in)
     nk=50
     min_b, max_b = np.array(bounds).T
-    l=list(cga(fitPar,ob,min_b,max_b,angle_in,nk=nk,its=80000))
+    l=list(cga(fitPar,ob,min_b,max_b,angle_in,nk=nk,its=10000))
     print(l[-1])
     print(np.sqrt(fitDistance(l[-1][0][-1,:],ob)))
     print(best_error_np)
