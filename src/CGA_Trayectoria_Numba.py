@@ -29,12 +29,15 @@ best_error_np=np.array([])
 best_acc_np=np.array([])
 best_vel_np=np.array([])
 #Diferential Evolution
-def cga(fobj,obj, min_b,max_b,angle_in, mut=0.3, crossp=0.6,nk=50, popsize=1000, its=1500,pcj=0.5,pmj=1.0):
+def cga(fobj,obj, min_b,max_b,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=2000, its=4000,pcj=0.5,pmj=1.0):
+    global cambio_fitness
     global errores_mejor
     global best_error_np
     global best_vel_np
     global best_acc_np
     errores_mejor=np.zeros(its)
+    cambio_fitness=np.zeros(its)
+    dfitness=0;
     pop=initGauss(min_b,max_b,nk,popsize,angle_in)
     #pop=initanh(bounds,nk,popsize,angle_in)
     Pfitness=np.zeros(popsize)
@@ -89,6 +92,10 @@ def cga(fobj,obj, min_b,max_b,angle_in, mut=0.3, crossp=0.6,nk=50, popsize=1000,
             #    termino=True
             #print(i)
             errores_mejor[i]=Pfitness[best_idx]
+            dfitness+=(its*(errores_mejor[i]-errores_mejor[i-1])/1-dfitness)/8
+            dfitness_ang=np.arctan(dfitness)
+            mut=0.4-0.6/pi*dfitness_ang
+            cambio_fitness[i]=dfitness_ang
             yield best, Pfitness[best_idx]
 
 
@@ -332,9 +339,15 @@ if __name__ == '__main__':
     print(angle_in)
     nk=50
     min_b, max_b = np.array(bounds).T
+<<<<<<< HEAD
     l=list(cga(fitPar,ob,min_b,max_b,angle_in,nk=nk,its=10000))
+=======
+    l=list(cga(fitPar,ob,min_b,max_b,angle_in,nk=nk,its=4000))
+>>>>>>> ea3aa1f7f16c238cb6b280b9bd70531b751187ae
     print(l[-1])
     print(np.sqrt(fitDistance(l[-1][0][-1,:],ob)))
+
+    plt.figure(1)
     print(best_error_np)
     plt.subplot(2,2,1)
     plt.plot(best_error_np)
@@ -353,13 +366,9 @@ if __name__ == '__main__':
     plt.xlabel("interaciones")
     plt.title("vel")
     plt.ylabel("vel")
-    plt.show()
 
 
-
-
-
-
+    plt.figure(2)
     plt.subplot(2,2,1)
     plt.plot(np.arange(nk),l[-1][0][:,0])
     plt.xlabel("pasos")
@@ -382,12 +391,19 @@ if __name__ == '__main__':
     plt.xlabel("pasos")
     plt.title("Joint 3")
     plt.ylabel("Angulo del Joint Rad")
-    plt.show()
+    #plt.show()
     #print(errores_mejor)
+    plt.figure(3)
     plt.plot(errores_mejor)
     plt.xlabel("iteraciones")
     plt.title("fitness mejor individuo")
     plt.ylabel("fitness")
+
+    plt.figure(4)
+    plt.plot(cambio_fitness)
+    plt.xlabel("iteraciones")
+    plt.title("Derivada fitness")
+    plt.ylabel("dfitness/di")
     plt.show()
 
     #except:
