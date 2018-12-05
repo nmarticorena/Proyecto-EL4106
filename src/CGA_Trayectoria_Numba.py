@@ -25,11 +25,16 @@ pi=np.pi
 bounds=[(-5, 5), (-pi/2, pi/2), (-pi/2, pi/2), (-pi/2, pi/2)]
 nk=20
 
-
+best_error_np=np.array([])
+best_acc_np=np.array([])
+best_vel_np=np.array([])
 #Diferential Evolution
 def cga(fobj,obj, min_b,max_b,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=2000, its=4000,pcj=0.5,pmj=1.0):
-    global errores_mejor
     global cambio_fitness
+    global errores_mejor
+    global best_error_np
+    global best_vel_np
+    global best_acc_np
     errores_mejor=np.zeros(its)
     cambio_fitness=np.zeros(its)
     dfitness=0;
@@ -65,21 +70,26 @@ def cga(fobj,obj, min_b,max_b,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=2000,
             fobj(pop,obj,angle_in,nk,Pfitness)
             best_idx=np.argmax(Pfitness)
             best=pop[best_idx].copy()
-            # if i%10==0:
-            #     df = pd.DataFrame(best)
-            #     df.to_csv("trayectorias/file_path{}.csv".format(i))
-            # if i==its-1:
-            #     df = pd.DataFrame(best)
-            #     df.to_csv("trayectorias/file_path{}.csv".format(its))
+            best_error,best_acceleracion,best_velocidad=fit_grafico(best,ob,angle_in,nk)
+            best_error_np=np.append(best_error_np,best_error)
+            best_acc_np=np.append(best_acc_np,best_acceleracion)
+            best_vel_np=np.append(best_vel_np,best_velocidad)
+
+            if i%10==0:
+                df = pd.DataFrame(best)
+                df.to_csv("trayectorias/file_path{}.csv".format(i))
+            if i==its-1:
+                df = pd.DataFrame(best)
+                df.to_csv("trayectorias/file_path{}.csv".format(its))
             if hall_of_fame_f<Pfitness[best_idx]:
                 #print("Encontre uno mejor con fitness igual a {}".format(Pfitness[best_idx]))
                 #print("alcance un fitness de:{} con promedio {}".format(Pfitness[best_idx],np.mean(Pfitness)))
                 hall_of_fame=best.copy()
                 hall_of_fame_f=Pfitness[best_idx]
 
-            if Pfitness[best_idx]>=2.0-0.001:
-                print("alcance un fitness de:{}".format(Pfitness[best_idx]))
-                termino=True
+            #if Pfitness[best_idx]>=2.0-0.001:
+            #    print("alcance un fitness de:{}".format(Pfitness[best_idx]))
+            #    termino=True
             #print(i)
             errores_mejor[i]=Pfitness[best_idx]
             dfitness+=(its*(errores_mejor[i]-errores_mejor[i-1])/1-dfitness)/8
@@ -156,17 +166,46 @@ def fitC(ind,ob,angle_in,nk):
     0.25
     res+=fitDistance(ind[-1,:],ob)*(1000)
     res2=0
+    res3=0
     for i in range(nk-2):
         res2+=np.abs((np.abs(ind[i,0]-ind[i+1,0]))-((np.abs(ind[i+1,0]-ind[i+2,0]))))*(2.0) #quizas ponerlo en 5
         res2+=np.abs((np.abs(ind[i,1]-ind[i+1,1]))-((np.abs(ind[i+1,1]-ind[i+2,1]))))*(3.0/2.0)
         res2+=np.abs((np.abs(ind[i,2]-ind[i+1,2]))-((np.abs(ind[i+1,2]-ind[i+2,2]))))*(1)
         res2+=np.abs((np.abs(ind[i,3]-ind[i+1,3]))-((np.abs(ind[i+1,3]-ind[i+2,3]))))*(1.0/2.0)
+        res3+=np.abs(ind[i,0]-ind[i+1,0])*2
+        res3+=np.abs(ind[i,1]-ind[i+1,1])*1.5
+        res3+=np.abs(ind[i,2]-ind[i+1,2])
+        res3+=np.abs(ind[i,3]-ind[i+1,3])*0.5
     #print(res,res2)
     res2=res2
     #res+=np.sum(np.abs(angle_in-ind[0,:]))
     #print("funcion de diferencia final {}".format(res))
     #print("Suma de errores {}".format(res2))
-    return (1/(1+res))*(1/(1+res2))
+    return (1/(1+res))*(1/(1+res2))*(1/(1+res3))
+
+@jit(nopython=True)
+def fit_grafico(ind,ob,angle_in,nk):
+    global Masa
+    res=0;
+    0.25
+    res+=fitDistance(ind[-1,:],ob)*(1000)
+    res2=0
+    res3=0
+    for i in range(nk-2):
+        res2+=np.abs((np.abs(ind[i,0]-ind[i+1,0]))-((np.abs(ind[i+1,0]-ind[i+2,0]))))*(2.0) #quizas ponerlo en 5
+        res2+=np.abs((np.abs(ind[i,1]-ind[i+1,1]))-((np.abs(ind[i+1,1]-ind[i+2,1]))))*(3.0/2.0)
+        res2+=np.abs((np.abs(ind[i,2]-ind[i+1,2]))-((np.abs(ind[i+1,2]-ind[i+2,2]))))*(1)
+        res2+=np.abs((np.abs(ind[i,3]-ind[i+1,3]))-((np.abs(ind[i+1,3]-ind[i+2,3]))))*(1.0/2.0)
+        res3+=np.abs(ind[i,0]-ind[i+1,0])*2
+        res3+=np.abs(ind[i,1]-ind[i+1,1])*1.5
+        res3+=np.abs(ind[i,2]-ind[i+1,2])
+        res3+=np.abs(ind[i,3]-ind[i+1,3])*0.5
+    #print(res,res2)
+    res2=res2
+    #res+=np.sum(np.abs(angle_in-ind[0,:]))
+    #print("funcion de diferencia final {}".format(res))
+    #print("Suma de errores {}".format(res2))
+    return res,res2,res3
 
 @guvectorize(['void(float64[:,:,:], float64[:],float64[:],int64, float64[:])'], '(n,k,m),(p),(m),()->(n)',target='cpu')
 def fitPar(pop,ob,angle_in,nk,fit):
@@ -295,17 +334,38 @@ if __name__ == '__main__':
     print(angle_in)
     nk=50
     min_b, max_b = np.array(bounds).T
-    l=list(cga(fitPar,ob,min_b,max_b,angle_in,nk=nk))
+    l=list(cga(fitPar,ob,min_b,max_b,angle_in,nk=nk,its=4000))
     print(l[-1])
     print(np.sqrt(fitDistance(l[-1][0][-1,:],ob)))
+
     plt.figure(1)
+    print(best_error_np)
+    plt.subplot(2,2,1)
+    plt.plot(best_error_np)
+    plt.ylim([0,0.01])
+    plt.title("Error")
+    plt.ylabel("Error")
+
+    plt.subplot(2,2,2)
+    plt.plot(best_acc_np)
+    plt.xlabel("interaciones")
+    plt.title("acc")
+    plt.ylabel("acc")
+    
+    plt.subplot(2,2,3)
+    plt.plot(best_vel_np)
+    plt.xlabel("interaciones")
+    plt.title("vel")
+    plt.ylabel("vel")
+
+
+    plt.figure(2)
     plt.subplot(2,2,1)
     plt.plot(np.arange(nk),l[-1][0][:,0])
     plt.xlabel("pasos")
     plt.title("Joint 0")
     plt.ylabel("Angulo del Joint Rad")
     plt.subplot(2,2,2)
-
     plt.plot(np.arange(nk),l[-1][0][:,1])
     plt.xlabel("pasos")
     plt.title("Joint 1")
@@ -324,13 +384,13 @@ if __name__ == '__main__':
     plt.ylabel("Angulo del Joint Rad")
     #plt.show()
     #print(errores_mejor)
-    plt.figure(2)
+    plt.figure(3)
     plt.plot(errores_mejor)
     plt.xlabel("iteraciones")
     plt.title("fitness mejor individuo")
     plt.ylabel("fitness")
 
-    plt.figure(3)
+    plt.figure(4)
     plt.plot(cambio_fitness)
     plt.xlabel("iteraciones")
     plt.title("Derivada fitness")
