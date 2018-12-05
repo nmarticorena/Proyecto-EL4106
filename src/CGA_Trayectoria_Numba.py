@@ -27,9 +27,12 @@ nk=20
 
 
 #Diferential Evolution
-def cga(fobj,obj, min_b,max_b,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=4000, its=1000,pcj=0.5,pmj=1.0):
+def cga(fobj,obj, min_b,max_b,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=2000, its=4000,pcj=0.5,pmj=1.0):
     global errores_mejor
+    global cambio_fitness
     errores_mejor=np.zeros(its)
+    cambio_fitness=np.zeros(its)
+    dfitness=0;
     pop=initGauss(min_b,max_b,nk,popsize,angle_in)
     #pop=initanh(bounds,nk,popsize,angle_in)
     Pfitness=np.zeros(popsize)
@@ -62,12 +65,12 @@ def cga(fobj,obj, min_b,max_b,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=4000,
             fobj(pop,obj,angle_in,nk,Pfitness)
             best_idx=np.argmax(Pfitness)
             best=pop[best_idx].copy()
-            if i%10==0:
-                df = pd.DataFrame(best)
-                df.to_csv("trayectorias/file_path{}.csv".format(i))
-            if i==its-1:
-                df = pd.DataFrame(best)
-                df.to_csv("trayectorias/file_path{}.csv".format(its))
+            # if i%10==0:
+            #     df = pd.DataFrame(best)
+            #     df.to_csv("trayectorias/file_path{}.csv".format(i))
+            # if i==its-1:
+            #     df = pd.DataFrame(best)
+            #     df.to_csv("trayectorias/file_path{}.csv".format(its))
             if hall_of_fame_f<Pfitness[best_idx]:
                 #print("Encontre uno mejor con fitness igual a {}".format(Pfitness[best_idx]))
                 #print("alcance un fitness de:{} con promedio {}".format(Pfitness[best_idx],np.mean(Pfitness)))
@@ -79,6 +82,10 @@ def cga(fobj,obj, min_b,max_b,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=4000,
                 termino=True
             #print(i)
             errores_mejor[i]=Pfitness[best_idx]
+            dfitness+=(its*(errores_mejor[i]-errores_mejor[i-1])/1-dfitness)/8
+            dfitness_ang=np.arctan(dfitness)
+            mut=0.4-0.6/pi*dfitness_ang
+            cambio_fitness[i]=dfitness_ang
             yield best, Pfitness[best_idx]
 
 
@@ -291,6 +298,7 @@ if __name__ == '__main__':
     l=list(cga(fitPar,ob,min_b,max_b,angle_in,nk=nk))
     print(l[-1])
     print(np.sqrt(fitDistance(l[-1][0][-1,:],ob)))
+    plt.figure(1)
     plt.subplot(2,2,1)
     plt.plot(np.arange(nk),l[-1][0][:,0])
     plt.xlabel("pasos")
@@ -314,12 +322,19 @@ if __name__ == '__main__':
     plt.xlabel("pasos")
     plt.title("Joint 3")
     plt.ylabel("Angulo del Joint Rad")
-    plt.show()
+    #plt.show()
     #print(errores_mejor)
+    plt.figure(2)
     plt.plot(errores_mejor)
     plt.xlabel("iteraciones")
     plt.title("fitness mejor individuo")
     plt.ylabel("fitness")
+
+    plt.figure(3)
+    plt.plot(cambio_fitness)
+    plt.xlabel("iteraciones")
+    plt.title("Derivada fitness")
+    plt.ylabel("dfitness/di")
     plt.show()
 
     #except:
