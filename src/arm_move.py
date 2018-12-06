@@ -76,7 +76,7 @@ class Generator(object):
             self.pub2.publish(self.command2)
             self.pub3.publish(self.command3)
             self.pub4.publish(self.command4)
-            rospy.sleep(0.5)
+            rospy.sleep(10./nk)
             print("Angulo {}".format(i))
         return
 
@@ -84,12 +84,13 @@ class Generator(object):
 
 
 if __name__ == '__main__':
+    document=sys.argv[1]
     rospy.init_node('CGA')
     rospy.loginfo('CGA Arm controller')
-    nk=20
+    nk=50
     its=500
     angle_in=[0,0,0,0]
-    df=pd.read_csv("./trayectorias/file_path800.csv")
+    df=pd.read_csv("./trayectorias/file_path{}.csv".format(document))
     a=df.values
     a=a[:,1:]
     Generator(lista=a,nk=nk,its=its)
