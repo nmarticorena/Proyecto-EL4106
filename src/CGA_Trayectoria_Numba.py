@@ -19,6 +19,7 @@ plt.rcParams['figure.figsize'] = (7,7)
 plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=None, hspace=0.4)
 #plt.style.use('seaborn-white')
 Masa=5
+gamma=100
 
 #PARAMS
 pi=np.pi
@@ -28,6 +29,9 @@ nk=20
 best_error_np=np.array([])
 best_acc_np=np.array([])
 best_vel_np=np.array([])
+best_E_np=np.array([])
+
+
 #Diferential Evolution
 def cga(fobj,obj, min_b,max_b,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=2000, its=4000,pcj=0.5,pmj=1.0):
     global cambio_fitness
@@ -35,6 +39,7 @@ def cga(fobj,obj, min_b,max_b,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=2000,
     global best_error_np
     global best_vel_np
     global best_acc_np
+    global best_E_np
     a=np.random.rand()
     b=np.random.rand()*(1-a)
     c=1-a-b
@@ -78,10 +83,11 @@ def cga(fobj,obj, min_b,max_b,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=2000,
             fobj(pop,obj,angle_in,nk,a,b,c,Pfitness)
             best_idx=np.argmax(Pfitness)
             best=pop[best_idx].copy()
-            best_error,best_acceleracion,best_velocidad=fit_grafico(best,ob,angle_in,nk)
+            best_error,best_acceleracion,best_velocidad,best_energia=fit_grafico(best,ob,angle_in,nk)
             best_error_np=np.append(best_error_np,best_error)
             best_acc_np=np.append(best_acc_np,best_acceleracion)
             best_vel_np=np.append(best_vel_np,best_velocidad)
+            best_E_np=np.append(best_E_np,best_energia)
 
             if i%10==0:
                 df = pd.DataFrame(best)
@@ -164,12 +170,13 @@ def fitDistance(individual,objective):
             T[i,0]=a*cosT[j]-c*sinT[j]
             T[i][2]=a*sinT[j]+c*cosT[j]
             T[i][3]+=0.6*c
-    T[:,3]+=0.5*T[:,2]
+    T[:,3]+=0.6*T[:,2]
     return np.sum(np.square(T[:,3]-objective))
 
 @jit(nopython=True)
 def fitC(ind,ob,angle_in,nk,a,b,c):
     global Masa
+    global gamma
     res=0;
     0.25
     res+=fitDistance(ind[-1,:],ob)*(1000)
@@ -201,20 +208,28 @@ def fitC(ind,ob,angle_in,nk,a,b,c):
     #Energia=res1*e[0]+res2*e[1]+res3*e[2]+res4*e[3]
     
     Energia=res1+res2+res3+res4
-    
+    Energia=gamma*Energia
+    #Energia=np.log10(Energia)
 
     res=1/(1+res)
     
-    return res*1/(1+Energia)
+
+
+    return res*(1/(1+Energia))
     #return (res*f[0]+Energia*f[1])*(res*Energia)
 
 @jit(nopython=True)
 def fit_grafico(ind,ob,angle_in,nk):
     global Masa
+    global gamma
     res=0;
-    res+=fitDistance(ind[-1,:],ob)*(1000)
+    res+=fitDistance(ind[-1,:],ob)*(100000)
     res2=0
     res3=0
+    E1=0
+    E2=0
+    E3=0
+    E4=0
     for i in range(nk-2):
         res2+=np.abs((np.abs(ind[i,0]-ind[i+1,0]))-((np.abs(ind[i+1,0]-ind[i+2,0]))))*(2.0) #quizas ponerlo en 5
         res2+=np.abs((np.abs(ind[i,1]-ind[i+1,1]))-((np.abs(ind[i+1,1]-ind[i+2,1]))))*(3.0/2.0)
@@ -223,13 +238,26 @@ def fit_grafico(ind,ob,angle_in,nk):
         res3+=np.abs(ind[i,0]-ind[i+1,0])*2
         res3+=np.abs(ind[i,1]-ind[i+1,1])*1.5
         res3+=np.abs(ind[i,2]-ind[i+1,2])
-        res3+=np.abs(ind[i,3]-ind[i+1,3])*500
+        res3+=np.abs(ind[i,3]-ind[i+1,3])*0.5
+
+        E1+=np.power(ind[i,0]-ind[i+1,0],2)*2
+        E2+=np.power(ind[i,1]-ind[i+1,1],2)*1.5
+        E3+=np.power(ind[i,2]-ind[i+1,2],2)
+        E4+=np.power(ind[i,3]-ind[i+1,3],2)*0.5
+    
+    Energia=E1+E2+E3+E4
+    
     #print(res,res2)
-    res2=res2
+    res=1/(1+res)
+    res2=1/(1+res2)
+    res3=1/(1+res3)
+    #Energia=1/(1+gamma*Energia)
+    Energia=gamma*Energia
+    Energia=np.log(Energia)
     #res+=np.sum(np.abs(angle_in-ind[0,:]))
     #print("funcion de diferencia final {}".format(res))
     #print("Suma de errores {}".format(res2))
-    return res,res2,res3
+    return res,res2,res3,Energia
 
 @guvectorize(['void(float64[:,:,:], float64[:],float64[:],int64, float64,float64,float64,float64[:])'], '(n,k,m),(p),(m),(),(),(),()->(n)',target='cpu')
 def fitPar(pop,ob,angle_in,nk,a,b,c,fit):
@@ -354,32 +382,43 @@ if __name__ == '__main__':
     angle=sys.argv[2].split(',')
     ob=np.array([float(i) for i in point])
     angle_in=np.array([float(i) for i in angle])
+    angle_in=angle_in*np.pi/180.0
     print(ob)
     print(angle_in)
     nk=50
     min_b, max_b = np.array(bounds).T
-    l=list(cga(fitPar,ob,min_b,max_b,angle_in,nk=nk,its=5000))
+    l=list(cga(fitPar,ob,min_b,max_b,angle_in,nk=nk,its=20000))
     print(l[-1])
     print(np.sqrt(fitDistance(l[-1][0][-1,:],ob)))
 
     plt.figure(1)
     plt.subplot(2,2,1)
     plt.plot(best_error_np)
-    plt.ylim([0,0.01])
+    #plt.ylim([0,0.01])
+    plt.ylim([0,1.1])
     plt.title("Error")
     plt.ylabel("Error")
 
     plt.subplot(2,2,2)
     plt.plot(best_acc_np)
+    plt.ylim([0,1.1])
     plt.xlabel("interaciones")
     plt.title("acc")
     plt.ylabel("acc")
     
     plt.subplot(2,2,3)
     plt.plot(best_vel_np)
+    plt.ylim([0,1])
     plt.xlabel("interaciones")
     plt.title("vel")
     plt.ylabel("vel")
+
+    plt.subplot(2,2,4)
+    plt.plot(best_E_np)
+    #plt.ylim([0,1.1])
+    plt.xlabel("pasos")
+    plt.title("Energia")
+    plt.ylabel("Unidad de energia")
 
 
     plt.figure(2)
