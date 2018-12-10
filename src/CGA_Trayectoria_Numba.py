@@ -13,7 +13,8 @@ except:
 
 # configuracion graficos
 sns.set()  # estilo por defecto de seaborn
-sns.set_context('poster', font_scale=0.8) # contexto notebook 
+sns.set_context('talk', font_scale=0.8) # contexto notebook 
+sns.set_style("whitegrid")
 #plt.rcParams.update({'font.size': 15})
 plt.rcParams['figure.figsize'] = (7,7)
 plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=None, hspace=0.4)
@@ -374,6 +375,7 @@ def makeChilds(pop,popsize,Pfitness,aceptados_array,childs,min_b,max_b,elite_tot
         childs[j*2+1+elite_total]=C2.copy()
 
 
+
 if __name__ == '__main__':
 
     #try:
@@ -382,12 +384,12 @@ if __name__ == '__main__':
     angle=sys.argv[2].split(',')
     ob=np.array([float(i) for i in point])
     angle_in=np.array([float(i) for i in angle])
-    angle_in=angle_in*np.pi/180.0
+    angle_in=np.deg2rad(angle_in)
     print(ob)
     print(angle_in)
     nk=50
     min_b, max_b = np.array(bounds).T
-    l=list(cga(fitPar,ob,min_b,max_b,angle_in,nk=nk,its=20000))
+    l=list(cga(fitPar,ob,min_b,max_b,angle_in,nk=nk,its=2000))
     print(l[-1])
     print(np.sqrt(fitDistance(l[-1][0][-1,:],ob)))
 
@@ -421,31 +423,46 @@ if __name__ == '__main__':
     plt.ylabel("Unidad de energia")
 
 
+
+    Joint0rad=l[-1][0][:,0]
+    Joint1rad=l[-1][0][:,1]
+    Joint2rad=l[-1][0][:,2]
+    Joint3rad=l[-1][0][:,3]
+
+    Joint0=np.rad2deg(Joint0rad)
+    Joint1=np.rad2deg(Joint1rad)
+    Joint2=np.rad2deg(Joint2rad)
+    Joint3=np.rad2deg(Joint3rad)
+
     plt.figure(2)
     plt.subplot(2,2,1)
-    plt.plot(np.arange(nk),l[-1][0][:,0])
+    plt.plot(np.arange(nk),Joint0)
     plt.xlabel("pasos")
     plt.title("Joint 0")
-    plt.ylabel("Angulo del Joint Rad")
+    plt.ylabel("Angulo del Joint Grad")
+    plt.ylim([-181,181])
+    
     plt.subplot(2,2,2)
-    plt.plot(np.arange(nk),l[-1][0][:,1])
+    plt.plot(np.arange(nk),Joint1)
     plt.xlabel("pasos")
     plt.title("Joint 1")
-    plt.ylabel("Angulo del Joint Rad")
-
+    plt.ylabel("Angulo del Joint Grad")
+    plt.ylim([-95,95])
+    
     plt.subplot(2,2,3)
-    plt.plot(np.arange(nk),l[-1][0][:,2])
+    plt.plot(np.arange(nk),Joint2)
     plt.xlabel("pasos")
     plt.title("Joint 2")
-    plt.ylabel("Angulo del Joint Rad")
+    plt.ylabel("Angulo del Joint Grad")
+    plt.ylim([-95,95])
 
     plt.subplot(2,2,4)
-    plt.plot(np.arange(nk),l[-1][0][:,3])
+    plt.plot(np.arange(nk),Joint3)
     plt.xlabel("pasos")
     plt.title("Joint 3")
-    plt.ylabel("Angulo del Joint Rad")
-    #plt.show()
-    #print(errores_mejor)
+    plt.ylabel("Angulo del Joint Grad")
+    plt.ylim([-95,95])
+
     plt.figure(3)
     plt.plot(errores_mejor)
     plt.xlabel("iteraciones")
