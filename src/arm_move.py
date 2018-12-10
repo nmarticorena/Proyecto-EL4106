@@ -34,7 +34,7 @@ dataP=POINTER(c_double)
 
 
 class Generator(object):
-    def __init__(self,its,nk,lista):
+    def __init__(self,its,nk,lista,velocidad):
         self.pub1 = rospy.Publisher('/SimpleArm/joint1_position_controller/command', Float64, queue_size=1)
         self.pub2 = rospy.Publisher('/SimpleArm/joint2_position_controller/command', Float64, queue_size=1)
         self.pub3 = rospy.Publisher('/SimpleArm/joint3_position_controller/command', Float64, queue_size=1)
@@ -43,21 +43,23 @@ class Generator(object):
         self.command2=Float64()
         self.command3=Float64()
         self.command4=Float64()
-        self.Iterator(its=its,nk=nk,lista=lista)
+        self.velocidad=velocidad
+        for i in lista:
+            self.Iterator(its=its,nk=nk,lista=i)
     def Iterator(self,its,nk,lista):
-        i0=0
-        i1=its/4
-        i2=its/2
-        i3=its-1
         print("Voy a empezar a graficar")
         rospy.sleep(2)
-        self.Reset_Arm()
-        self.Show(lista,nk,i0)
-    def Reset_Arm(self):
-        self.command1.data=0
-        self.command2.data=0
-        self.command3.data=0
-        self.command4.data=0
+        df=pd.read_csv("./trayectorias/file_path{}.csv".format(lista))
+        a=df.values
+        nk=a.shape[0]
+        a=a[:,1:]
+        self.Reset_Arm(a)
+        self.Show(a,nk,lista)
+    def Reset_Arm(self,lista):
+        self.command1.data=lista[0,0]
+        self.command2.data=lista[0,1]
+        self.command3.data=lista[0,2]
+        self.command4.data=lista[0,3]
         self.pub1.publish(self.command1)
         self.pub2.publish(self.command2)
         self.pub3.publish(self.command3)
@@ -76,7 +78,7 @@ class Generator(object):
             self.pub2.publish(self.command2)
             self.pub3.publish(self.command3)
             self.pub4.publish(self.command4)
-            rospy.sleep(10./nk)
+            rospy.sleep(self.velocidad/nk)
             print("Angulo {}".format(i))
         return
 
@@ -84,16 +86,21 @@ class Generator(object):
 
 
 if __name__ == '__main__':
-    document=sys.argv[1]
+    document=sys.argv[1].split(',')
+    velocidad=int(sys.argv[2])
+    document_arr=np.array([int(i) for i in document])
     rospy.init_node('CGA')
     rospy.loginfo('CGA Arm controller')
-    nk=50
     its=500
-    angle_in=[0,0,0,0]
-    df=pd.read_csv("./trayectorias/file_path{}.csv".format(document))
-    a=df.values
-    a=a[:,1:]
-    Generator(lista=a,nk=nk,its=its)
+
+    try:
+        for i in document_arr:
+            df=pd.read_csv("./trayectorias/file_path{}.csv".format(i))
+    except:
+        print("Existe un individuo que no existe, recuerda que deben ser divisibles por 10")
+        exit(1)
+
+    Generator(lista=document_arr,nk=nk,its=its,velocidad=velocidad)
     
 
     #except:
