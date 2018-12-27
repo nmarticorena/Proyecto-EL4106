@@ -34,7 +34,7 @@ dataP=POINTER(c_double)
 
 
 class Generator(object):
-    def __init__(self,its,nk,lista,velocidad):
+    def __init__(self,nk,lista,velocidad):
         self.pub1 = rospy.Publisher('/SimpleArm/joint1_position_controller/command', Float64, queue_size=1)
         self.pub2 = rospy.Publisher('/SimpleArm/joint2_position_controller/command', Float64, queue_size=1)
         self.pub3 = rospy.Publisher('/SimpleArm/joint3_position_controller/command', Float64, queue_size=1)
@@ -44,9 +44,10 @@ class Generator(object):
         self.command3=Float64()
         self.command4=Float64()
         self.velocidad=velocidad
+        print(self.velocidad)
         for i in lista:
-            self.Iterator(its=its,nk=nk,lista=i)
-    def Iterator(self,its,nk,lista):
+            self.Iterator(nk=nk,lista=i)
+    def Iterator(self,nk,lista):
         print("Voy a empezar a graficar")
         rospy.sleep(2)
         df=pd.read_csv("./trayectorias/file_path{}.csv".format(lista))
@@ -79,6 +80,7 @@ class Generator(object):
             self.pub3.publish(self.command3)
             self.pub4.publish(self.command4)
             rospy.sleep(self.velocidad/nk)
+            print(self.velocidad/nk)
             print("Angulo {}".format(i))
         return
 
@@ -87,12 +89,11 @@ class Generator(object):
 
 if __name__ == '__main__':
     document=sys.argv[1].split(',')
-    velocidad=int(sys.argv[2])
+    velocidad=float(sys.argv[2])
+    print("velocidad {}".format(velocidad))
     document_arr=np.array([int(i) for i in document])
     rospy.init_node('CGA')
     rospy.loginfo('CGA Arm controller')
-    its=500
-
     try:
         for i in document_arr:
             df=pd.read_csv("./trayectorias/file_path{}.csv".format(i))
@@ -100,7 +101,7 @@ if __name__ == '__main__':
         print("Existe un individuo que no existe, recuerda que deben ser divisibles por 10")
         exit(1)
 
-    Generator(lista=document_arr,nk=nk,its=its,velocidad=velocidad)
+    Generator(lista=document_arr,nk=nk,velocidad=velocidad)
     
 
     #except:
