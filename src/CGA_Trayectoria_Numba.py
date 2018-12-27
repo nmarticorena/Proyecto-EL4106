@@ -20,11 +20,11 @@ sns.set_style("whitegrid")
 plt.rcParams['figure.figsize'] = (7,7)
 plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=None, hspace=0.4)
 #plt.style.use('seaborn-white')
-Masa=5
 
+#PARAMS
+Masa=5
 phi=0.001
 sigma=-1000
-#PARAMS
 pi=np.pi
 bounds=[(-5, 5), (-pi/2, pi/2), (-pi/2, pi/2), (-pi/2, pi/2)]
 nk=20
