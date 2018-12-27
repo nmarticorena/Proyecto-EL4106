@@ -6,6 +6,7 @@ from numba import jit,vectorize,guvectorize, prange
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+import Energy
 try:
     from tqdm import tqdm
 except:
@@ -20,7 +21,7 @@ plt.rcParams['figure.figsize'] = (7,7)
 plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=None, hspace=0.4)
 #plt.style.use('seaborn-white')
 Masa=5
-gamma=100
+gamma=1
 
 #PARAMS
 pi=np.pi
@@ -181,30 +182,23 @@ def fitC(ind,ob,angle_in,nk,a,b,c):
     res=0;
     0.25
     res+=fitDistance(ind[-1,:],ob)*(1000)
-    res1=0
-    res2=0
-    res3=0
-    res4=0
-    for i in range(nk-2):
-        res1+=np.power(ind[i,0]-ind[i+1,0],2)*2
-        res2+=np.power(ind[i,1]-ind[i+1,1],2)*1.5
-        res3+=np.power(ind[i,2]-ind[i+1,2],2)
-        res4+=np.power(ind[i,3]-ind[i+1,3],2)*0.5
-    
-    e=np.random.rand(4)
-    e=e/np.sum(e)
-
-    f=np.random.rand(2)
-    f=f/np.sum(f)
-
-    Energia=res1+res2+res3+res4
-    Energia=gamma*Energia
+    if (np.sqrt(res)<0.005):
+        res=res
+    else:
+        res=res
 
     res=1/(1+res)
     
+    Energia=Energy.fitness(ind)
+    if (Energia<0.0001):
+        res2=0    
+    else:
+        res2=1/(1+Energia/(125*5))
+    #Energia=gamma*Energia
+    
 
 
-    return res*(1/(1+Energia))
+    return res*res2
     #return (res*f[0]+Energia*f[1])*(res*Energia)
 
 @jit(nopython=True)
@@ -212,37 +206,19 @@ def fit_grafico(ind,ob,angle_in,nk):
     global Masa
     global gamma
     res=0;
-    res+=fitDistance(ind[-1,:],ob)*(100000)
-    res2=0
-    res3=0
-    E1=0
-    E2=0
-    E3=0
-    E4=0
-    for i in range(nk-2):
-        res2+=np.abs((np.abs(ind[i,0]-ind[i+1,0]))-((np.abs(ind[i+1,0]-ind[i+2,0]))))*(2.0) #quizas ponerlo en 5
-        res2+=np.abs((np.abs(ind[i,1]-ind[i+1,1]))-((np.abs(ind[i+1,1]-ind[i+2,1]))))*(3.0/2.0)
-        res2+=np.abs((np.abs(ind[i,2]-ind[i+1,2]))-((np.abs(ind[i+1,2]-ind[i+2,2]))))*(1)
-        res2+=np.abs((np.abs(ind[i,3]-ind[i+1,3]))-((np.abs(ind[i+1,3]-ind[i+2,3]))))*(1.0/2.0)
-        res3+=np.abs(ind[i,0]-ind[i+1,0])*2
-        res3+=np.abs(ind[i,1]-ind[i+1,1])*1.5
-        res3+=np.abs(ind[i,2]-ind[i+1,2])
-        res3+=np.abs(ind[i,3]-ind[i+1,3])*0.5
-
-        E1+=np.power(ind[i,0]-ind[i+1,0],2)*2
-        E2+=np.power(ind[i,1]-ind[i+1,1],2)*1.5
-        E3+=np.power(ind[i,2]-ind[i+1,2],2)
-        E4+=np.power(ind[i,3]-ind[i+1,3],2)*0.5
-    
-    Energia=E1+E2+E3+E4
+    res+=fitDistance(ind[-1,:],ob)
+    if (np.sqrt(res)<0.005):
+        res=res
+    else:
+        res=res
+    Energia=Energy.fitness(ind)
     
     #print(res,res2)
     res=1/(1+res)
-    res2=1/(1+res2)
-    res3=1/(1+res3)
     #Energia=1/(1+gamma*Energia)
     Energia=gamma*Energia
-    Energia=np.log(Energia)
+    res2=1/(1+Energia)
+    res3=1/(1+Energia/(125*5))
     #res+=np.sum(np.abs(angle_in-ind[0,:]))
     #print("funcion de diferencia final {}".format(res))
     #print("Suma de errores {}".format(res2))
@@ -377,8 +353,11 @@ if __name__ == '__main__':
     print(angle_in)
     nk=50
     min_b, max_b = np.array(bounds).T
-    l=list(cga(fitPar,ob,min_b,max_b,angle_in,nk=nk,its=2000))
+    l=list(cga(fitPar,ob,min_b,max_b,angle_in,nk=nk,its=10000,popsize=1000))
     print(l[-1])
+    for i in range(100):
+        energia=Energy.fitness(l[i][0])
+        #print(energia)
     print(np.sqrt(fitDistance(l[-1][0][-1,:],ob)))
 
     plt.figure(1)
