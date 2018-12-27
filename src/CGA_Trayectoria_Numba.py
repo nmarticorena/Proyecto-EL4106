@@ -21,16 +21,17 @@ plt.rcParams['figure.figsize'] = (7,7)
 plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=None, hspace=0.4)
 #plt.style.use('seaborn-white')
 Masa=5
-gamma=1
 
+phi=0.001
+sigma=-1000
 #PARAMS
 pi=np.pi
 bounds=[(-5, 5), (-pi/2, pi/2), (-pi/2, pi/2), (-pi/2, pi/2)]
 nk=20
 
 best_error_np=np.array([])
-best_acc_np=np.array([])
-best_vel_np=np.array([])
+best_fError_np=np.array([])
+best_fEnergia_np=np.array([])
 best_E_np=np.array([])
 
 
@@ -39,13 +40,9 @@ def cga(fobj,obj, min_b,max_b,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=2000,
     global cambio_fitness
     global errores_mejor
     global best_error_np
-    global best_vel_np
-    global best_acc_np
+    global best_fEnergia_np
+    global best_fError_np
     global best_E_np
-    a=np.random.rand()
-    b=np.random.rand()*(1-a)
-    c=1-a-b
-
 
     errores_mejor=np.zeros(its)
     cambio_fitness=np.zeros(its)
@@ -53,7 +50,9 @@ def cga(fobj,obj, min_b,max_b,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=2000,
     pop=initGauss(min_b,max_b,nk,popsize,angle_in)
     #pop=initanh(bounds,nk,popsize,angle_in)
     Pfitness=np.zeros(popsize)
-    fobj(pop,obj,angle_in,nk,a,b,c,Pfitness)
+    fDistancia=np.zeros(popsize)
+    fEnergia=np.zeros(popsize)
+    fobj(pop,obj,angle_in,nk,Pfitness,fDistancia,fEnergia)
     best_idx = np.argmax(Pfitness)
     best = pop[best_idx].copy()
     hall_of_fame=best.copy()
@@ -71,9 +70,6 @@ def cga(fobj,obj, min_b,max_b,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=2000,
             errores_mejor[i]=Pfitness[best_idx]
             yield best,Pfitness[best_idx]
         else:
-            a=np.random.rand()
-            b=np.random.rand()*(1-a)
-            c=1-a-b
             fitnessRel=Pfitness/np.sum(Pfitness)
 
             aceptados=0
@@ -82,13 +78,13 @@ def cga(fobj,obj, min_b,max_b,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=2000,
             makeChilds(pop,popsize,Pfitness,aceptados_array,childs,min_b,max_b,elite_total,mut,crossp,pcj,pmj)
 
             pop=childs.copy()
-            fobj(pop,obj,angle_in,nk,a,b,c,Pfitness)
+            fobj(pop,obj,angle_in,nk,Pfitness,fDistancia,fEnergia)
             best_idx=np.argmax(Pfitness)
             best=pop[best_idx].copy()
-            best_error,best_acceleracion,best_velocidad,best_energia=fit_grafico(best,ob,angle_in,nk)
+            best_error,best_energia=fit_grafico(best,ob,angle_in,nk)
             best_error_np=np.append(best_error_np,best_error)
-            best_acc_np=np.append(best_acc_np,best_acceleracion)
-            best_vel_np=np.append(best_vel_np,best_velocidad)
+            best_fError_np=np.append(best_fError_np,fDistancia[best_idx])
+            best_fEnergia_np=np.append(best_fEnergia_np,fEnergia[best_idx])
             best_E_np=np.append(best_E_np,best_energia)
 
             if i%10==0:
@@ -110,7 +106,7 @@ def cga(fobj,obj, min_b,max_b,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=2000,
             errores_mejor[i]=Pfitness[best_idx]
             dfitness+=(its*(errores_mejor[i]-errores_mejor[i-1])/1-dfitness)/8
             dfitness_ang=np.arctan(dfitness)
-            mut=0.4-0.6/pi*dfitness_ang
+            #mut=0.4-0.6/pi*dfitness_ang
             cambio_fitness[i]=dfitness_ang
             yield best, Pfitness[best_idx]
 
@@ -175,59 +171,60 @@ def fitDistance(individual,objective):
     T[:,3]+=0.6*T[:,2]
     return np.sum(np.square(T[:,3]-objective))
 
-@jit(nopython=True)
-def fitC(ind,ob,angle_in,nk,a,b,c):
-    global Masa
-    global gamma
-    res=0;
-    0.25
-    res+=fitDistance(ind[-1,:],ob)*(1000)
-    if (np.sqrt(res)<0.005):
-        res=res
-    else:
-        res=res
+# @jit(nopython=True)
+# def fitC(ind,ob,angle_in,nk,a,b,c):
+#     global Masa
+#     global gamma
+#     res=0;
+#     0.25
+#     res+=fitDistance(ind[-1,:],ob)*(1000)
+#     if (np.sqrt(res)<0.005):
+#         res=res
+#     else:
+#         res=res
 
-    res=1/(1+res)
+#     res=1/(1+res)
     
-    Energia=Energy.fitness(ind)
-    if (Energia<0.0001):
-        res2=0    
-    else:
-        res2=1/(1+Energia/(125*5))
-    #Energia=gamma*Energia
+#     Energia=Energy.fitness(ind)
+#     if (Energia<0.0001):
+#         res2=0    
+#     else:
+#         res2=1/(1+Energia/(125*5))
+#     #Energia=gamma*Energia
     
 
 
-    return res*res2
-    #return (res*f[0]+Energia*f[1])*(res*Energia)
+#     return res*res2
+#     #return (res*f[0]+Energia*f[1])*(res*Energia)
 
 @jit(nopython=True)
 def fit_grafico(ind,ob,angle_in,nk):
     global Masa
-    global gamma
-    res=0;
-    res+=fitDistance(ind[-1,:],ob)
-    if (np.sqrt(res)<0.005):
-        res=res
-    else:
-        res=res
+    distancia=np.sqrt(fitDistance(ind[-1,:],ob))
     Energia=Energy.fitness(ind)
-    
-    #print(res,res2)
-    res=1/(1+res)
-    #Energia=1/(1+gamma*Energia)
-    Energia=gamma*Energia
-    res2=1/(1+Energia)
-    res3=1/(1+Energia/(125*5))
     #res+=np.sum(np.abs(angle_in-ind[0,:]))
     #print("funcion de diferencia final {}".format(res))
     #print("Suma de errores {}".format(res2))
-    return res,res2,res3,Energia
+    return distancia,Energia
 
-@guvectorize(['void(float64[:,:,:], float64[:],float64[:],int64, float64,float64,float64,float64[:])'], '(n,k,m),(p),(m),(),(),(),()->(n)',target='cpu')
-def fitPar(pop,ob,angle_in,nk,a,b,c,fit):
-    for j in range(pop.shape[0]):
-            fit[j]=fitC(pop[j],ob,angle_in,nk,a,b,c)
+@jit(['void(float64[:,:,:], float64[:],float64[:],int64,float64[:],float64[:],float64[:])'],nopython=True)
+def fitPar(pop,ob,angle_in,nk,fit,fDistancia,fEnergia):
+    global Masa,phi,sigma
+    popsize=pop.shape[0]
+    distancia=np.zeros(popsize)
+    energia=np.zeros(popsize)
+    for j in range(popsize):
+        energia[j]=Energy.fitness(pop[j])
+        #print(energia[j])
+        distancia[j]=fitDistance(pop[j][-1,:],ob)
+    Emin=np.min(energia)
+    Emean=np.mean(energia)
+    logPhi=np.log(phi)
+    fEnergia[:]=np.exp((logPhi/(Emean- Emin))*(energia-Emin))
+    #print(fEnergia)
+    fDistancia[:]=np.exp(sigma*distancia)
+    fit[:]=fDistancia*(1+fEnergia)
+
 
 @jit(['float64[:,:,:](float64[:],float64[:], int64, int64, float64[:])'],nopython=True)
 def initGauss(min_b,max_b,nk,popsize,angle_in):
@@ -369,25 +366,27 @@ if __name__ == '__main__':
     plt.ylabel("Error")
 
     plt.subplot(2,2,2)
-    plt.plot(best_acc_np)
-    plt.ylim([0,1.1])
-    plt.xlabel("interaciones")
-    plt.title("acc")
-    plt.ylabel("acc")
-    
-    plt.subplot(2,2,3)
-    plt.plot(best_vel_np)
-    plt.ylim([0,1])
-    plt.xlabel("interaciones")
-    plt.title("vel")
-    plt.ylabel("vel")
-
-    plt.subplot(2,2,4)
     plt.plot(best_E_np)
     #plt.ylim([0,1.1])
     plt.xlabel("pasos")
     plt.title("Energia")
     plt.ylabel("Unidad de energia")
+
+    plt.subplot(2,2,3)
+    plt.plot(best_fError_np)
+    plt.ylim([0,1.1])
+    plt.xlabel("interaciones")
+    plt.title("fError")
+    plt.ylabel("fitness Error")
+    
+    plt.subplot(2,2,4)
+    plt.plot(best_fEnergia_np)
+    plt.ylim([0,1])
+    plt.xlabel("interaciones")
+    plt.title("fEnergia")
+    plt.ylabel("fitness Energia")
+
+    
 
 
 

@@ -70,7 +70,7 @@ def fitness(ind):
 		t2=np.abs(torque2(theta,vel,acc,sin,cos)*vel[2])
 		t3=np.abs(torque3(theta,vel,acc,sin,cos)*vel[3])
 		
-		t0+=M*vel[0]**2
+		t0+=3*M*vel[0]**2
 		#print("===================")
 		#print(t0)
 		#print(t1)
