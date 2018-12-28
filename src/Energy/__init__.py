@@ -90,4 +90,4 @@ if __name__ == '__main__':
     ind=df.values
     print(ind[1:,1:])
     res=fitness(ind[1:,1:])
-    print(1/(1+res/(125*5)))
+    print(res)
