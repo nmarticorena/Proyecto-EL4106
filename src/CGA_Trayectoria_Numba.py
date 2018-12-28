@@ -23,7 +23,7 @@ plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=None, h
 
 #PARAMS
 Masa=5
-phi=0.001
+phi=0.00001
 sigma=-1000
 pi=np.pi
 bounds=[(-5, 5), (-pi/2, pi/2), (-pi/2, pi/2), (-pi/2, pi/2)]
@@ -221,7 +221,6 @@ def fitPar(pop,ob,angle_in,nk,fit,fDistancia,fEnergia):
     Emean=np.mean(energia)
     logPhi=np.log(phi)
     fEnergia[:]=np.exp((logPhi/(Emean- Emin))*(energia-Emin))
-    #print(fEnergia)
     fDistancia[:]=np.exp(sigma*distancia)
     fit[:]=fDistancia*(1+fEnergia)
 
@@ -367,7 +366,7 @@ if __name__ == '__main__':
 
     plt.subplot(2,2,2)
     plt.plot(best_E_np)
-    #plt.ylim([0,1.1])
+    plt.ylim([-0.1,300])
     plt.xlabel("pasos")
     plt.title("Energia")
     plt.ylabel("Unidad de energia")
