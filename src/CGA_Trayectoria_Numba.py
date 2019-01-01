@@ -81,7 +81,7 @@ def cga(fobj,obj, min_b,max_b,angle_in, mut=0.1, crossp=0.6,nk=50, popsize=2000,
             fobj(pop,obj,angle_in,nk,Pfitness,fDistancia,fEnergia)
             best_idx=np.argmax(Pfitness)
             best=pop[best_idx].copy()
-            best_error,best_energia=fit_grafico(best,ob,angle_in,nk)
+            best_error,best_energia=fit_grafico(best,obj,angle_in,nk)
             best_error_np=np.append(best_error_np,best_error)
             best_fError_np=np.append(best_fError_np,fDistancia[best_idx])
             best_fEnergia_np=np.append(best_fEnergia_np,fEnergia[best_idx])
