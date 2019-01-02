@@ -26,7 +26,7 @@ Masa=5
 phi=0.00001
 sigma=-1000
 pi=np.pi
-bounds=[(-5, 5), (-pi/2, pi/2), (-pi/2, pi/2), (-pi/2, pi/2)]
+bounds=[(-pi, pi), (-pi/2, pi/2), (-pi/2, pi/2), (-pi/2, pi/2)]
 nk=20
 
 best_error_np=np.array([])
